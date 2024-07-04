@@ -5,6 +5,7 @@ samples/*
 tools/*
 LICENSE
 README.md
+manifest.yaml
 
 # Generates certs
 
