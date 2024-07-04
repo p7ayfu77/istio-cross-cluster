@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: helloworld-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 3002
+      name: http
+      protocol: HTTP
+    hosts:
+    - "helloworld.sample.com"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: helloworld-vs
+  namespace: sample
+spec:
+  hosts:
+  - "helloworld.sample.com"
+  gateways:
+  - istio-system/helloworld-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /hello
+    route:
+    - destination:
+        port:
+          number: 5000
+        host: helloworld

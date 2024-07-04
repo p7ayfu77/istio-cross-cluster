@@ -1,0 +1,11 @@
+# folders and files from istioctl package
+bin/*
+manifests/*
+samples/*
+tools/*
+LICENSE
+README.md
+
+# Generates certs
+
+certs/*

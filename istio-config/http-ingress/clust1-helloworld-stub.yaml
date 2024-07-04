@@ -1,0 +1,54 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: helloworld
+  namespace: sample
+spec:
+  hosts:
+  - helloworld.sample.com
+  workloadSelector:
+    labels:
+      app: helloworld
+  location: MESH_EXTERNAL
+  ports:
+  - name: http
+    number: 5000
+    protocol: HTTP
+  resolution: STATIC
+---
+apiVersion: networking.istio.io/v1beta1
+kind: WorkloadEntry
+metadata:
+  name: helloworld
+  namespace: sample
+  labels:
+    app: helloworld
+spec:
+  labels:
+    app: helloworld
+  address: 192.168.65.254 # host.minikube.internal
+  ports:
+    http: 3002
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: helloworld
+  name: helloworld
+spec:
+  ports:
+  - name: http
+    port: 5000
+    protocol: TCP
+  selector:
+    app: helloworld
+  type: ClusterIP
+
+#$ kubectl -n sample exec -it sleep-5577c64d7c-j9gcc -c sleep -- sh
+
+#~ $ curl -H Host:helloworld.sample.com  http://helloworld.sample:5000/hello
+#Hello version: v2, instance: helloworld-v2-779454bb5f-kbq24
+
+#~ $ curl -H Host:helloworld.sample.com  http://helloworld:5000/hello
+#Hello version: v2, instance: helloworld-v2-779454bb5f-kbq24

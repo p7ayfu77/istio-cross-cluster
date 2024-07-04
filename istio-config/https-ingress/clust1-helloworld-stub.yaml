@@ -1,0 +1,50 @@
+apiVersion: networking.istio.io/v1
+kind: WorkloadEntry
+metadata:
+  name: helloworld
+  namespace: sample
+  labels:
+    app: helloworld
+    security.istio.io/tlsMode: istio
+spec:
+  labels:
+    app: helloworld
+    security.istio.io/tlsMode: istio
+  address: 192.168.65.254 # host.minikube.internal
+  ports:
+    http: 15443 
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: helloworld-mtls
+spec:
+  host: helloworld
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL # OMG!!! this works in combo with AUTO_PASSTHROUGH on other side.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: helloworld
+  name: helloworld
+spec:
+  ports:
+  - name: http
+    port: 5000
+    protocol: TCP
+  selector:
+    app: helloworld
+  type: ClusterIP
+
+#NOTES:
+#curl -v -HHost:helloworld.sample.com --resolve "helloworld.sample.com:15443:127.0.0.1" \
+#  --cacert certs/cluster2/root-cert.pem "https://localhost:15443/hello"
+
+#https://istio.io/latest/docs/tasks/traffic-management/ingress/secure-ingress/
+
+#curl -v -HHost:helloworld.sample.com --resolve "helloworld.sample.com:15443:127.0.0.1" "https://l27.0.0.1:15443/hello"
+
+#curl -v -HHost:helloworld.sample.com  http://helloworld.sample:5000/hello
